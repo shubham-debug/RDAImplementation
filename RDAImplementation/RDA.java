@@ -372,14 +372,23 @@ public class RDA {
 		}
 		System.out.println();
 		//This section print the satisfaction factor of all the VM
-		// if the VM is not placed then the satisfaction factor of that VM is -1
+		// if the VM is not placed then the satisfaction factor of that VM is 0
 		System.out.println("This is satisfaction factor for VMs");
 		int[] factor = this.satisfactionFactor(arrayOfVMs, matching, numSPs); 
-		System.out.println(Arrays.toString(factor));
+		for(int i = 0; i<factor.length; i++) {
+			System.out.println("vm"+i+" satisfaction factor is "+factor[i]+"%");
+		}
+		//System.out.println(Arrays.toString(factor));
 		System.out.println("This is satisfaction factor for SPs");
-		System.out.println(Arrays.toString(this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs)));
+		int[] fact = this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs);
+		for(int i = 0; i<fact.length; i++) {
+			System.out.println("SP"+i+" satisfaction factor is "+fact[i]+"%"); 
+		}
 		System.out.println("This is revenue for SPs");
-		System.out.println(Arrays.toString(this.revenueSP(arrayOfSPs, arrayOfVMs)));
+		int[] rev = this.revenueSP(arrayOfSPs, arrayOfVMs);
+		for(int i = 0; i<rev.length; i++) { 
+			System.out.println("SP"+i+" revenue is "+rev[i]+"$"); 
+		}
 	}
 	
 	private int pivotSP(int[] sortedSPs, SP[] arrayOfSPs, int start, int end) {
