@@ -196,6 +196,7 @@ public class RandomisedRDA {
 			if(currVM.count > arrayOfSPs.length) {
 				break;
 			}
+			currVM.count += 1;
 			if(i == -1) {
 				continue; 
 			}
