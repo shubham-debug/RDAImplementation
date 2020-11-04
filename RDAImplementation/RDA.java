@@ -7,7 +7,7 @@ public class RDA {
 	
 	// This method will return the index of element in array arr[]
 	private int index(int[] arr, int element) {
-		int ans = 100;
+		int ans = 999999999;
 		for(int i=0; i<arr.length; i++) {
 			if(arr[i]==element) {
 				ans = i;
@@ -22,10 +22,12 @@ public class RDA {
 	//this is the utility method for engage method
 	public int[] match(int vm, int[] matching, VM[] arrayOfVMs, SP sp) {
 		
+		//System.out.println("This is match condition");
 		VM currVM = arrayOfVMs[vm];
 		int priorityOfCurrVM = this.index(sp.priorityListOfVMs, vm);
+		//System.out.println("This is something "+priorityOfCurrVM);
 		// breject is used to update the Host.bestRejected attribute
-		int breject = arrayOfVMs.length; 
+		int breject = 999999999; 
 		//temp will store all the VM that has priority less than currVM
 		int[] temp = new int[arrayOfVMs.length];
 		Arrays.fill(temp, -1);
@@ -39,13 +41,13 @@ public class RDA {
 				count += 1;
 			}	
 		} 
-		
-		int requiredCapacity = 0;
+		//System.out.println(Arrays.toString(temp));
+		int requiredCapacity = sp.capacity;
 		count = 0;
 		// here cpu is the need of currVM and same for memory and I take count<100 as this is the maximum count value possible
 		// This loop will check that adding the cpu and memory requirement of all the VMs that has less priority than the current VM
 		// and count is used to mark that upto what index of temp[] array the requirement is fulfilled
-		while(requiredCapacity < currVM.requirement && count<arrayOfVMs.length) {
+		while(requiredCapacity < currVM.requirement && count<arrayOfVMs.length) { 
 			if(temp[count]==-1) {
 				//this condition means that we just go through all the vm that has less priority than currVM
 				break;
@@ -83,7 +85,7 @@ public class RDA {
 				}
 			} 
 			sp.currentlyMatched.add(vm);
-			 
+			  
 		}
 		int[] ans = new int[arrayOfVMs.length]; 
 		Arrays.fill(ans, -1);
@@ -94,7 +96,7 @@ public class RDA {
 					ans[i]=temp[i];
 				}
 				else {
-					ans[i]=-1;
+					break;
 				}
 			}	
 	  }
@@ -119,7 +121,7 @@ public class RDA {
 	// This method will take the object of Host
 	// and then reject all the VM that has priority less the Host.bestRejected
 	// this method will return the array of VMs that is rejected by the host.
-	private int[] reject(SP sp) {
+	private int[] reject(SP sp,VM[] arrayOfVMs) {
 		int[] ans = new int[sp.currentlyMatched.size()];
 		Arrays.fill(ans, -1);
 		int counter = 0;
@@ -127,6 +129,7 @@ public class RDA {
 			int temp = this.index(sp.priorityListOfVMs, sp.currentlyMatched.get(i));
 			if(temp > sp.bestRejected) {
 				ans[counter] = sp.currentlyMatched.get(i);
+				sp.capacity += arrayOfVMs[ans[counter]].requirement;
 				//sp.currentlyMatched.remove(i);
 				counter++;
 			}
@@ -167,6 +170,7 @@ public class RDA {
 			// if this condition satisfies the currentVM is placed in the host and no other VMs are rejected so we break the loop set all the appropriate attributes
 			// and then returns an empty vmThatIsRejectedByTheCurrentHost
 			if(arrayOfSPs[i].capacity >= currVM.requirement) {
+				//System.out.println("This is if condition");
 				arrayOfSPs[i].capacity -= currVM.requirement;
 				arrayOfSPs[i].currentlyMatched.add(vm);
 				currVM.currentlyMatched = true;
@@ -184,7 +188,7 @@ public class RDA {
 			// so  in this condition we call the match(currentVMIndex, matching, arrayOfVMs, hostToPropose)
 			// which the check that whether or not currentVM can be placed or not in the host by removing some VMs with less priority
 			else {
-				vmThatIsRejectedByTheCurrentHost = this.match(vm, matching, arrayOfVMs, arrayOfSPs[i]);
+				vmThatIsRejectedByTheCurrentHost = this.match(vm, matching, arrayOfVMs, arrayOfSPs[i]); 
 				// In this condition we check the array vmThatIsRejectedByTheCurrentHost index 0 
 				// if that index does not equal to -1 it means that some VMs are rejected and the match method will return array with rejected VMs
 				// only when the currentVM is placed otherwise not.
@@ -196,18 +200,18 @@ public class RDA {
 					matching[vm]=i;
 					// we call the reject method to get all the VMs that has priority less than Host.bestRejected
 					// we use break statement because the current VM is placed
-					tempArray = this.reject(arrayOfSPs[i]);
+					tempArray = this.reject(arrayOfSPs[i],arrayOfVMs); 
 				}
 				// In this condition the currentVM is not placed in the proposed host so we update the Host.bestRejected and then call the reject method 
 				// which then reject all the VMs that has less priority than Host.bestRejected
 				else{
-						int tempBestRejected = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
-						if(arrayOfSPs[i].bestRejected > tempBestRejected) {
+					int tempBestRejected = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
+					if(arrayOfSPs[i].bestRejected > tempBestRejected) {
 						arrayOfSPs[i].bestRejected = tempBestRejected;
-						tempArray = this.reject(arrayOfSPs[i]);
-						}
+						tempArray = this.reject(arrayOfSPs[i],arrayOfVMs); 
+					}
 				}
-				// freeVM method will free the VMs that is rejected and stored in tempArray
+				// freeVM method will free the VMs that is rejected and stored in tempArray 
 				this.freeVM(tempArray, arrayOfVMs, matching);
 				// Here we just add all the rejected VMs in the tempArray and store those in vmThatIsRejectedBecauseOfBestRejected
 				for(int l = 0; l < tempArray.length; l++) { 
@@ -279,11 +283,10 @@ public class RDA {
 			float sfactor = ((numSP - j)*100)/numSP; 
 			int sfact = (int)sfactor;
 			factor[i] = sfact;
-		}
-		
+		}	
 		return factor;
 	}
-	
+	 
 	// this method will calculate the satisfaction factor of the Hosts based on the formula for the satisfaction factor.
 	public int[] satisfactionFactorHost(SP[] arrayOfSPs, int[] matching, int numVM, int numSP) {
 		int[] factor = new int[numSP];
@@ -361,10 +364,10 @@ public class RDA {
 				capacity += counter; 
 			}		
 		} 
-		System.out.println("This is cost");
-		for(int i =0; i<numSPs; i++) {
-			System.out.print(arrayOfSPs[i].cost+ " ");
-		}
+//		System.out.println("This is cost");
+//		for(int i =0; i<numSPs; i++) {
+//			System.out.print(arrayOfSPs[i].cost+ " ");
+//		}
 		System.out.println();
 		System.out.println("This is matching");
 		for(int i = 0; i<numVM; i++) {
@@ -375,20 +378,36 @@ public class RDA {
 		// if the VM is not placed then the satisfaction factor of that VM is 0
 		System.out.println("This is satisfaction factor for VMs");
 		int[] factor = this.satisfactionFactor(arrayOfVMs, matching, numSPs); 
+		System.out.println(Arrays.toString(factor)); 
+		System.out.print("Average satisfaction factor for VMs: ");
+		int avg = 0;
 		for(int i = 0; i<factor.length; i++) {
-			System.out.println("vm"+i+" satisfaction factor is "+factor[i]+"%");
+			avg += factor[i];
 		}
-		//System.out.println(Arrays.toString(factor));
+		avg = avg/factor.length;
+		System.out.print(avg+"% \n");
 		System.out.println("This is satisfaction factor for SPs");
 		int[] fact = this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs);
+		System.out.println(Arrays.toString(fact)); 
+		System.out.print("Average satisfaction factor for SPs: ");
+		avg = 0;
 		for(int i = 0; i<fact.length; i++) {
-			System.out.println("SP"+i+" satisfaction factor is "+fact[i]+"%"); 
+			avg += fact[i];
 		}
+		avg = avg/fact.length;
+		System.out.print(avg+"%\n");
+		System.out.println(Arrays.toString(fact));  
 		System.out.println("This is revenue for SPs");
 		int[] rev = this.revenueSP(arrayOfSPs, arrayOfVMs);
+		System.out.println(Arrays.toString(rev));
+		int totalRev = 0;
+		System.out.print("Total revenue of SPs: ");
 		for(int i = 0; i<rev.length; i++) { 
-			System.out.println("SP"+i+" revenue is "+rev[i]+"$"); 
+			totalRev += rev[i];
 		}
+		System.out.print(totalRev+"$\n");
+		
+		
 	}
 	
 	private int pivotSP(int[] sortedSPs, SP[] arrayOfSPs, int start, int end) {
@@ -478,16 +497,34 @@ public class RDA {
 		System.out.println("Enter the number of SPs");
 		int numberOfSPs = sc.nextInt();
 		VM[] arrayOfVMs = new VM[numberOfVMs];
+		int wholeRequirementOfAllVMs = 0;
 		for(int i = 0; i<numberOfVMs; i++) {
 			arrayOfVMs[i] = new VM(numberOfSPs);
+			wholeRequirementOfAllVMs += arrayOfVMs[i].requirement;
 		}
 		SP[] arrayOfSPs = new SP[numberOfSPs];
-		for(int i = 0; i<numberOfSPs; i++) {
-			arrayOfSPs[i] = new SP(numberOfVMs); 
+		while(true) {
+			int wholeCapacityOfAllSPs = 0;
+			for(int i = 0; i<numberOfSPs; i++) {
+				arrayOfSPs[i] = new SP(numberOfVMs);
+				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
+			}
+			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
+				break;
+			}
 		}
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);
 		System.out.println("Sorted");
+		System.out.println("This is SPs");
+		for(int i = 0; i< numberOfSPs; i++) {
+			System.out.print(arrayOfSPs[i].capacity+" ");
+		}
+		System.out.println();
+		for(int i = 0; i< numberOfVMs; i++) {
+			System.out.print(arrayOfVMs[i].requirement+" ");
+		}
+		System.out.println();
 		// In this section we create the object of GeneratePriorityList
 		// and then generate the priority list and store that priority in Prioritylist.txt file 
 		GeneratePriorityList gn = new GeneratePriorityList();
@@ -521,6 +558,12 @@ public class RDA {
 			count+=1;
 		}
 		obj.rDA(numberOfVMs, numberOfSPs, arrayOfVMs, arrayOfSPs);
+//		System.out.println("This is the matched VMs");
+//		for(int i = 0; i<numberOfSPs; i++) {
+//			System.out.println("This is SP"+i+" :"+arrayOfSPs[i].currentlyMatched);
+//			System.out.println(arrayOfSPs[i].bestRejected);
+//			System.out.println(arrayOfSPs[i].capacity); 
+//		}
 		System.out.println("successfull");
 		sc.close();
 		br.close();

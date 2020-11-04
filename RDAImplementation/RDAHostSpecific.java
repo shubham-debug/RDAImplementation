@@ -226,20 +226,34 @@ public class RDAHostSpecific {
 		// if the VM is not placed then the satisfaction factor of that VM is 0
 		System.out.println("This is satisfaction factor for VMs");
 		int[] factor = this.satisfactionFactor(arrayOfVMs, numSPs); 
+		System.out.println(Arrays.toString(factor)); 
+		System.out.print("Average satisfaction factor for VMs: ");
+		int avg = 0;
 		for(int i = 0; i<factor.length; i++) {
-			System.out.println("vm"+i+" satisfaction factor is "+factor[i]+"%");
+			avg += factor[i];
 		}
-		//System.out.println(Arrays.toString(factor));
+		avg = avg/factor.length;
+		System.out.print(avg+"% \n");
 		System.out.println("This is satisfaction factor for SPs");
-		int[] fact = this.satisfactionFactorHost(arrayOfSPs,numVMs, numSPs); 
+		int[] fact = this.satisfactionFactorHost(arrayOfSPs, numVMs, numSPs);
+		System.out.println(Arrays.toString(fact)); 
+		System.out.print("Average satisfaction factor for SPs: ");
+		avg = 0;
 		for(int i = 0; i<fact.length; i++) {
-			System.out.println("SP"+i+" satisfaction factor is "+fact[i]+"%"); 
+			avg += fact[i];
 		}
+		avg = avg/fact.length;
+		System.out.print(avg+"%\n");
+		System.out.println(Arrays.toString(fact));  
 		System.out.println("This is revenue for SPs");
 		int[] rev = this.revenueSP(arrayOfSPs, arrayOfVMs);
+		System.out.println(Arrays.toString(rev));
+		int totalRev = 0;
+		System.out.print("Total revenue of SPs: ");
 		for(int i = 0; i<rev.length; i++) { 
-			System.out.println("SP"+i+" revenue is "+rev[i]+"$"); 
+			totalRev += rev[i];
 		}
+		System.out.print(totalRev+"$\n");
 
 		 
 	}
@@ -333,12 +347,21 @@ public class RDAHostSpecific {
 		System.out.println("Enter the number of SPs");
 		int numberOfSPs = sc.nextInt();
 		VM[] arrayOfVMs = new VM[numberOfVMs];
+		int wholeRequirementOfAllVMs = 0;
 		for(int i = 0; i<numberOfVMs; i++) {
 			arrayOfVMs[i] = new VM(numberOfSPs);
+			wholeRequirementOfAllVMs += arrayOfVMs[i].requirement;
 		}
 		SP[] arrayOfSPs = new SP[numberOfSPs];
-		for(int i = 0; i<numberOfSPs; i++) {
-			arrayOfSPs[i] = new SP(numberOfVMs); 
+		while(true) {
+			int wholeCapacityOfAllSPs = 0;
+			for(int i = 0; i<numberOfSPs; i++) {
+				arrayOfSPs[i] = new SP(numberOfVMs);
+				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
+			}
+			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
+				break;
+			}
 		}
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);

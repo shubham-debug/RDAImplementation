@@ -17,9 +17,10 @@ public class SP {
 		priorityListOfVMs = new int[numVM];
 		Arrays.fill(priorityListOfVMs, -1);
 		capacity = (int)(1000*Math.random())+1;
-		bestRejected = numVM;
+		bestRejected = 999999999;
 		cost = (int)(10*Math.random())+1;
 		pointer = 0;
 		count = 0;
 	}
 }
+ 

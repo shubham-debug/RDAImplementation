@@ -119,7 +119,7 @@ public class RandomisedRDA {
 	// This method will take the object of Host
 	// and then reject all the VM that has priority less the Host.bestRejected
 	// this method will return the array of VMs that is rejected by the host.
-	private int[] reject(SP sp) {
+	private int[] reject(SP sp, VM[] arrayOfVMs) {
 		int[] ans = new int[sp.currentlyMatched.size()];
 		Arrays.fill(ans, -1);
 		int counter = 0;
@@ -127,6 +127,7 @@ public class RandomisedRDA {
 			int temp = this.index(sp.priorityListOfVMs, sp.currentlyMatched.get(i));
 			if(temp > sp.bestRejected) {
 				ans[counter] = sp.currentlyMatched.get(i);
+				sp.capacity += arrayOfVMs[ans[counter]].requirement;
 				//sp.currentlyMatched.remove(i);
 				counter++;
 			}
@@ -233,7 +234,7 @@ public class RandomisedRDA {
 					matching[vm]=i;
 					// we call the reject method to get all the VMs that has priority less than Host.bestRejected
 					// we use break statement because the current VM is placed
-					tempArray = this.reject(arrayOfSPs[i]);
+					tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
 					break;
 				}
 				// In this condition the currentVM is not placed in the proposed host so we update the Host.bestRejected and then call the reject method 
@@ -242,7 +243,7 @@ public class RandomisedRDA {
 						int tempBestRejected = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
 						if(arrayOfSPs[i].bestRejected > tempBestRejected) {
 						arrayOfSPs[i].bestRejected = tempBestRejected;
-						tempArray = this.reject(arrayOfSPs[i]);
+						tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
 					}
 				}
 				// freeVM method will free the VMs that is rejected and stored in tempArray
@@ -389,20 +390,34 @@ public class RandomisedRDA {
 		// if the VM is not placed then the satisfaction factor of that VM is 0
 		System.out.println("This is satisfaction factor for VMs");
 		int[] factor = this.satisfactionFactor(arrayOfVMs, matching, numSPs); 
+		System.out.println(Arrays.toString(factor)); 
+		System.out.print("Average satisfaction factor for VMs: ");
+		int avg = 0;
 		for(int i = 0; i<factor.length; i++) {
-			System.out.println("vm"+i+" satisfaction factor is "+factor[i]+"%");
+			avg += factor[i];
 		}
-		//System.out.println(Arrays.toString(factor));
+		avg = avg/factor.length;
+		System.out.print(avg+"% \n");
 		System.out.println("This is satisfaction factor for SPs");
 		int[] fact = this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs);
+		System.out.println(Arrays.toString(fact)); 
+		System.out.print("Average satisfaction factor for SPs: ");
+		avg = 0;
 		for(int i = 0; i<fact.length; i++) {
-			System.out.println("SP"+i+" satisfaction factor is "+fact[i]+"%"); 
+			avg += fact[i];
 		}
+		avg = avg/fact.length;
+		System.out.print(avg+"%\n");
+		System.out.println(Arrays.toString(fact));  
 		System.out.println("This is revenue for SPs");
 		int[] rev = this.revenueSP(arrayOfSPs, arrayOfVMs);
+		System.out.println(Arrays.toString(rev));
+		int totalRev = 0;
+		System.out.print("Total revenue of SPs: ");
 		for(int i = 0; i<rev.length; i++) { 
-			System.out.println("SP"+i+" revenue is "+rev[i]+"$"); 
+			totalRev += rev[i];
 		}
+		System.out.print(totalRev+"$\n"); 
 
 	}
 	
@@ -493,13 +508,22 @@ public class RandomisedRDA {
 		System.out.println("Enter the number of SPs");
 		int numberOfSPs = sc.nextInt();
 		VM[] arrayOfVMs = new VM[numberOfVMs];
+		int wholeRequirementOfAllVMs = 0;
 		for(int i = 0; i<numberOfVMs; i++) {
 			arrayOfVMs[i] = new VM(numberOfSPs);
+			wholeRequirementOfAllVMs += arrayOfVMs[i].requirement;
 		}
 		SP[] arrayOfSPs = new SP[numberOfSPs];
-		for(int i = 0; i<numberOfSPs; i++) {
-			arrayOfSPs[i] = new SP(numberOfVMs); 
-		}
+		while(true) {
+			int wholeCapacityOfAllSPs = 0;
+			for(int i = 0; i<numberOfSPs; i++) {
+				arrayOfSPs[i] = new SP(numberOfVMs);
+				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
+			}
+			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
+				break;
+			}
+		} 
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);
 		System.out.println("Sorted");
