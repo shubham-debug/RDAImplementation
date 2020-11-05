@@ -31,30 +31,34 @@ public class RDAHostSpecific {
 		int priorityOfcurrSP = this.index(currVM.priorityListOfSPs, sp);
 		int priorityOfMatchedSP = this.index(currVM.priorityListOfSPs, currVM.SP);
 		if(priorityOfcurrSP>priorityOfMatchedSP) {
+			if(currVM.bestRejected>priorityOfcurrSP) {
+				currVM.bestRejected = priorityOfcurrSP; 
+			}
 			return -1; 
 		} 
+		currVM.bestRejected = priorityOfMatchedSP;
 		int SPThatIsRejected = currVM.SP;
 		currVM.SP = sp;
 		return SPThatIsRejected; 	
 	}
 	
 	
-	public void removeAllVMThatHasLessPriorityThanBestRejected(SP currSP, int vm, ArrayList<ArrayList<Integer>> matching, VM[] arrayOfVMs, int sp) {
-		int priorityOfvm = this.index(currSP.priorityListOfVMs, vm); 
-		if(priorityOfvm<currSP.bestRejected) { 
-			currSP.bestRejected = priorityOfvm;
-			for(int i = 0; i<currSP.currentlyMatched.size(); i++) { 
-				if(this.index(currSP.priorityListOfVMs, currSP.currentlyMatched.get(i))>currSP.bestRejected) {  
-					arrayOfVMs[currSP.currentlyMatched.get(i)].currentlyMatched = false;  
-					arrayOfVMs[currSP.currentlyMatched.get(i)].SP = -1; 
-					currSP.capacity += arrayOfVMs[currSP.currentlyMatched.get(i)].requirement;
-					matching.get(sp).remove(new Integer(currSP.currentlyMatched.get(i))); 
-					currSP.currentlyMatched.remove(i);
-					i--;
-				}
-			}
-		}
-	}
+//	public void removeAllVMThatHasLessPriorityThanBestRejected(SP currSP, int vm, ArrayList<ArrayList<Integer>> matching, VM[] arrayOfVMs, int sp) {
+////		int priorityOfvm = this.index(currSP.priorityListOfVMs, vm); 
+////		if(priorityOfvm<currSP.bestRejected) { 
+////			currSP.bestRejected = priorityOfvm;
+//			for(int i = 0; i<currSP.currentlyMatched.size(); i++) { 
+//				if(this.index(currSP.priorityListOfVMs, currSP.currentlyMatched.get(i))>currSP.bestRejected) {  
+//					arrayOfVMs[currSP.currentlyMatched.get(i)].currentlyMatched = false;  
+//					arrayOfVMs[currSP.currentlyMatched.get(i)].SP = -1; 
+//					currSP.capacity += arrayOfVMs[currSP.currentlyMatched.get(i)].requirement;
+//					matching.get(sp).remove(new Integer(currSP.currentlyMatched.get(i))); 
+//					currSP.currentlyMatched.remove(i);
+//					i--;
+//				}
+//			}
+//		}
+////	}
 	 
 	// This method will send proposal to the VMs one by one and check that VM can be matched or not
 	// If the VM is currently matched then we check that whether currHost is better choice for that VM or not
@@ -71,7 +75,7 @@ public class RDAHostSpecific {
 			// so if vm>currHost.bestRejected simply means that from this vm to end of preference list all the other VMs has less priority that bestRejected
 			// here vm>currHost.bestRejected is taken because we are considering index of vm in the preference list as priority and the vm which has smaller index
 			// is most preferred
-			if(vm == -1 || vm>currSP.bestRejected) { 
+			if(vm == -1 || currSP.capacity<=0) {  
 				break;  
 			}
 			currSP.pointer += 1; 
@@ -96,19 +100,25 @@ public class RDAHostSpecific {
 					// the task is to update the currentlyMatchedList of hostThatLoseVM 
 					arrayOfSPs[SPThatLoseVM].currentlyMatched.remove(new Integer(vm));
 					// now the task is to update the best rejected of hostThatLoseVM and remove all the VM that has less priority than that
-					this.removeAllVMThatHasLessPriorityThanBestRejected(arrayOfSPs[SPThatLoseVM],vm,matching,arrayOfVMs,SPThatLoseVM); 
-					SPsWhichLostPairedVMs[count] = SPThatLoseVM;
-					count += 1; 
+					//this.removeAllVMThatHasLessPriorityThanBestRejected(arrayOfSPs[SPThatLoseVM],vm,matching,arrayOfVMs,SPThatLoseVM);
+					boolean flg = true;
+					for(int i = 0; i<SPsWhichLostPairedVMs.length; i++) {
+						if(SPThatLoseVM == SPsWhichLostPairedVMs[i]) {
+							flg = false;
+						}
+					}
+					if(flg) {
+						SPsWhichLostPairedVMs[count] = SPThatLoseVM;
+						count += 1; 
+					}
 					currSP.capacity -= currVM.requirement; 
 					currSP.currentlyMatched.add(vm); 
 					matching.get(sp).add(vm); 
 				}
-				
-			}  
-			else {
-				currSP.bestRejected = currSP.pointer; 
-				this.removeAllVMThatHasLessPriorityThanBestRejected(currSP, numVMs, matching, arrayOfVMs, sp);  
-			}
+				else {
+					continue;
+				}	
+			}  	
 		}
 		return SPsWhichLostPairedVMs;  
 	}
@@ -201,6 +211,7 @@ public class RDAHostSpecific {
 		int capacity = numSPs; 
 		while(capacity>0) {
 			int sp = this.popArray(waitingQueue);
+			//System.out.println(Arrays.toString(waitingQueue)); 
 			capacity -= 1;
 			if(sp == -1) {
 				break;
@@ -360,6 +371,9 @@ public class RDAHostSpecific {
 				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
 			}
 			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
+				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 230) {
+					continue;
+				}
 				break;
 			}
 		}

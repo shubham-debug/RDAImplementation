@@ -13,6 +13,8 @@ public class VM {
 	int SP;
 	int pointer;
 	boolean currentlyMatched;
+	// best rejected is here to tell us that we should not accept any SPs whose priority is less than bestRejected
+	int bestRejected;
 	
 	//constructor to initialize VMs
 	VM(int numSP){
@@ -23,6 +25,7 @@ public class VM {
 		SP = -1;
 		pointer = 0;
 		count = 0;
+		bestRejected = 999999999;
 	}
 
 }
