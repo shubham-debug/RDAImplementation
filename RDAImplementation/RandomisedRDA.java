@@ -222,43 +222,44 @@ public class RandomisedRDA {
 			// so  in this condition we call the match(currentVMIndex, matching, arrayOfVMs, hostToPropose)
 			// which the check that whether or not currentVM can be placed or not in the host by removing some VMs with less priority
 			else {
-				vmThatIsRejectedByTheCurrentHost = this.match(vm, matching, arrayOfVMs, arrayOfSPs[i]);
-				// In this condition we check the array vmThatIsRejectedByTheCurrentHost index 0 
-				// if that index does not equal to -1 it means that some VMs are rejected and the match method will return array with rejected VMs
-				// only when the currentVM is placed otherwise not.
-				if(vmThatIsRejectedByTheCurrentHost[0]!=-1) {
-					// freeVM method will free the VMs that is rejected by setting the attributes VM.currentlyMatched = false and VM.host = -1
-					this.freeVM(vmThatIsRejectedByTheCurrentHost, arrayOfVMs, matching);
-					currVM.pointer = j+1;
-					currVM.currentlyMatched = true;
-					matching[vm]=i;
-					// we call the reject method to get all the VMs that has priority less than Host.bestRejected
-					// we use break statement because the current VM is placed
-					tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
-					break;
-				}
-				// In this condition the currentVM is not placed in the proposed host so we update the Host.bestRejected and then call the reject method 
-				// which then reject all the VMs that has less priority than Host.bestRejected
-				else{
-						int tempBestRejected = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
-						if(arrayOfSPs[i].bestRejected > tempBestRejected) {
-						arrayOfSPs[i].bestRejected = tempBestRejected;
-						tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
-					}
-				}
-				// freeVM method will free the VMs that is rejected and stored in tempArray
-				this.freeVM(tempArray, arrayOfVMs, matching);
-				// Here we just add all the rejected VMs in the tempArray and store those in vmThatIsRejectedBecauseOfBestRejected
-				for(int l = 0; l < tempArray.length; l++) { 
-					if(tempArray[l] == -1) {
-						break;
-					}
-					else {
-						vmThatIsRejectedBecauseOfBestRejected[counter] = tempArray[l];
-						counter++;
-					}
-						
-				}
+				continue;
+//				vmThatIsRejectedByTheCurrentHost = this.match(vm, matching, arrayOfVMs, arrayOfSPs[i]);
+//				// In this condition we check the array vmThatIsRejectedByTheCurrentHost index 0 
+//				// if that index does not equal to -1 it means that some VMs are rejected and the match method will return array with rejected VMs
+//				// only when the currentVM is placed otherwise not.
+//				if(vmThatIsRejectedByTheCurrentHost[0]!=-1) {
+//					// freeVM method will free the VMs that is rejected by setting the attributes VM.currentlyMatched = false and VM.host = -1
+//					this.freeVM(vmThatIsRejectedByTheCurrentHost, arrayOfVMs, matching);
+//					currVM.pointer = j+1;
+//					currVM.currentlyMatched = true;
+//					matching[vm]=i;
+//					// we call the reject method to get all the VMs that has priority less than Host.bestRejected
+//					// we use break statement because the current VM is placed
+//					tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
+//					break;
+//				}
+//				// In this condition the currentVM is not placed in the proposed host so we update the Host.bestRejected and then call the reject method 
+//				// which then reject all the VMs that has less priority than Host.bestRejected
+//				else{
+//						int tempBestRejected = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
+//						if(arrayOfSPs[i].bestRejected > tempBestRejected) {
+//						arrayOfSPs[i].bestRejected = tempBestRejected;
+//						tempArray = this.reject(arrayOfSPs[i],arrayOfVMs);
+//					}
+//				}
+//				// freeVM method will free the VMs that is rejected and stored in tempArray
+//				this.freeVM(tempArray, arrayOfVMs, matching);
+//				// Here we just add all the rejected VMs in the tempArray and store those in vmThatIsRejectedBecauseOfBestRejected
+//				for(int l = 0; l < tempArray.length; l++) { 
+//					if(tempArray[l] == -1) {
+//						break;
+//					}
+//					else {
+//						vmThatIsRejectedBecauseOfBestRejected[counter] = tempArray[l];
+//						counter++;
+//					}
+//						
+//				}
 			}				 
 		}
 			
@@ -503,29 +504,21 @@ public class RandomisedRDA {
 		// arrayOfHosts and arrayOfVMs contains the objects of Host and VM class.
 		Scanner sc = new Scanner(System.in); 
 		RandomisedRDA obj = new RandomisedRDA();
+		int[] capacitiesOfSPs = {2000,1000,3000,4000};
+		int[] priceOfSPs = {8,7,12,9};
 		System.out.println("Enter the number of VMs");
 		int numberOfVMs = sc.nextInt();
 		System.out.println("Enter the number of SPs");
-		int numberOfSPs = sc.nextInt();
+		int numberOfSPs = sc.nextInt(); 
 		VM[] arrayOfVMs = new VM[numberOfVMs];
-		int wholeRequirementOfAllVMs = 0;
 		for(int i = 0; i<numberOfVMs; i++) {
 			arrayOfVMs[i] = new VM(numberOfSPs);
-			wholeRequirementOfAllVMs += arrayOfVMs[i].requirement;
 		}
 		SP[] arrayOfSPs = new SP[numberOfSPs];
-		while(true) {
-			int wholeCapacityOfAllSPs = 0;
-			for(int i = 0; i<numberOfSPs; i++) {
-				arrayOfSPs[i] = new SP(numberOfVMs);
-				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
-			}
-			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
-				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 800) {
-					continue;
-				}
-				break;
-			}
+		for(int i = 0; i<numberOfSPs; i++) {
+			arrayOfSPs[i] = new SP(numberOfVMs);
+			arrayOfSPs[i].capacity = capacitiesOfSPs[i];
+			arrayOfSPs[i].cost = priceOfSPs[i];
 		}  
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);

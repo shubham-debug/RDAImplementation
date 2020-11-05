@@ -492,29 +492,21 @@ public class RDA {
 		// arrayOfHosts and arrayOfVMs contains the objects of Host and VM class.
 		Scanner sc = new Scanner(System.in); 
 		RDA obj = new RDA();
+		int[] capacitiesOfSPs = {2000,1000,5000,2000};
+		int[] priceOfSPs = {8,7,12,9};
 		System.out.println("Enter the number of VMs");
 		int numberOfVMs = sc.nextInt();
 		System.out.println("Enter the number of SPs");
-		int numberOfSPs = sc.nextInt();
+		int numberOfSPs = sc.nextInt(); 
 		VM[] arrayOfVMs = new VM[numberOfVMs];
-		int wholeRequirementOfAllVMs = 0;
 		for(int i = 0; i<numberOfVMs; i++) {
 			arrayOfVMs[i] = new VM(numberOfSPs);
-			wholeRequirementOfAllVMs += arrayOfVMs[i].requirement;
 		}
 		SP[] arrayOfSPs = new SP[numberOfSPs];
-		while(true) {
-			int wholeCapacityOfAllSPs = 0;
-			for(int i = 0; i<numberOfSPs; i++) {
-				arrayOfSPs[i] = new SP(numberOfVMs);
-				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
-			}
-			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
-				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 800) {
-					continue;
-				}
-				break;
-			}
+		for(int i = 0; i<numberOfSPs; i++) {
+			arrayOfSPs[i] = new SP(numberOfVMs);
+			arrayOfSPs[i].capacity = capacitiesOfSPs[i];
+			arrayOfSPs[i].cost = priceOfSPs[i];
 		} 
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);
