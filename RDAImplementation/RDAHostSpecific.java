@@ -371,14 +371,14 @@ public class RDAHostSpecific {
 				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
 			}
 			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
-				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 230) {
+				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 800) {
 					continue;
 				}
 				break;
 			}
 		}
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
-		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);
+		int[] sortedVMs = obj.quickSortVM(arrayOfVMs); 
 		System.out.println("Sorted");
 		// In this section we create the object of GeneratePriorityList
 		// and then generate the priority list and store that priority in Prioritylist.txt file 

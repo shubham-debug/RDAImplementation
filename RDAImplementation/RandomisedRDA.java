@@ -521,9 +521,12 @@ public class RandomisedRDA {
 				wholeCapacityOfAllSPs += arrayOfSPs[i].capacity;
 			}
 			if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs) {
+				if(wholeCapacityOfAllSPs >= wholeRequirementOfAllVMs + 800) {
+					continue;
+				}
 				break;
 			}
-		} 
+		}  
 		int[] sortedSPs = obj.quickSortSP(arrayOfSPs);
 		int[] sortedVMs = obj.quickSortVM(arrayOfVMs);
 		System.out.println("Sorted");
