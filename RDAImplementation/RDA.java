@@ -492,7 +492,7 @@ public class RDA {
 		// arrayOfHosts and arrayOfVMs contains the objects of Host and VM class.
 		Scanner sc = new Scanner(System.in); 
 		RDA obj = new RDA();
-		int[] capacitiesOfSPs = {2000,1000,5000,2000};
+		int[] capacitiesOfSPs = {3000,2000,2500,2500};
 		int[] priceOfSPs = {8,7,12,9};
 		System.out.println("Enter the number of VMs");
 		int numberOfVMs = sc.nextInt();
