@@ -323,6 +323,28 @@ public class RDA {
 	}
 	
 	
+	private int welfare(SP[] arrayOfSPs, VM[] arrayOfVMs, int[] capacitiesOfSPs, int[] priceOfSPs) {
+		int welfareSP = 0;
+		int welfareVMs = 0;
+		int totalWelfare = 0;
+		for(int i = 0; i<arrayOfSPs.length; i++) {
+			for(int j = 0; j<arrayOfSPs[i].currentlyMatched.size(); j++) {
+				int vm = arrayOfSPs[i].currentlyMatched.get(j);
+				welfareSP += ((arrayOfVMs[vm].requirement * capacitiesOfSPs[i]) - (priceOfSPs[i]*arrayOfVMs[vm].requirement)) * arrayOfVMs[vm].requirement;
+			}
+		}
+		for(int i = 0; i<arrayOfVMs.length; i++) {
+			int sp = arrayOfVMs[i].SP;
+			if(sp == -1) {
+				continue;
+			}
+			welfareVMs += arrayOfVMs[i].requirement/(arrayOfVMs[i].requirement * capacitiesOfSPs[sp]);
+		}
+		totalWelfare = welfareSP + welfareVMs;
+		return totalWelfare;
+	} 
+	
+	
 	private void rDA(int numVM, int numSPs, VM[] arrayOfVMs, SP[] arrayOfSPs) {
 		// the waitingQueue initially contains all the VMs and it sends the VM for allocation in FIFO manner
 		// waitingQueue store the result as follows:
@@ -492,7 +514,7 @@ public class RDA {
 		// arrayOfHosts and arrayOfVMs contains the objects of Host and VM class.
 		Scanner sc = new Scanner(System.in); 
 		RDA obj = new RDA();
-		int[] capacitiesOfSPs = {3000,2000,2500,2500};
+		int[] capacitiesOfSPs = {3000,2000,3500,1500};
 		int[] priceOfSPs = {8,7,12,9};
 		System.out.println("Enter the number of VMs");
 		int numberOfVMs = sc.nextInt();
@@ -559,6 +581,8 @@ public class RDA {
 //			System.out.println(arrayOfSPs[i].bestRejected);
 //			System.out.println(arrayOfSPs[i].capacity); 
 //		}
+		System.out.print("This is welfare: ");
+		System.out.print(obj.welfare(arrayOfSPs, arrayOfVMs, capacitiesOfSPs, priceOfSPs)+"\n");
 		System.out.println("successfull");
 		sc.close();
 		br.close();
