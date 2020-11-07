@@ -322,32 +322,43 @@ public class RandomisedRDA {
 	}
 	
 	// this method will calculate the satisfaction factor of the Hosts based on the formula for the satisfaction factor.
-	public int[] satisfactionFactorHost(SP[] arrayOfSPs, int[] matching, int numVM, int numSP) {
-		int[] factor = new int[numSP];
+	private float[] satisfactionFactorHost(SP[] arrayOfSPs, int[] matching, int numVM, int numSP) {
+		float[] factor = new float[numSP];
 		for(int i = 0; i<numSP; i++) {
-			int sfactor = 0;
+			int count = 0;
+			double sfactor = 0.00f;
+			HashSet<Integer> h = new HashSet<Integer>();
 			for(int j = 0; j<arrayOfSPs[i].currentlyMatched.size(); j++) {
-				int k = this.index(arrayOfSPs[i].priorityListOfVMs, arrayOfSPs[i].currentlyMatched.get(j));
-				float temp = ((numVM-k)*100)/numVM;
-				sfactor += (int)temp;
+				h.add(arrayOfSPs[i].currentlyMatched.get(j));
 			}
-			if(arrayOfSPs[i].currentlyMatched.size() == 0) {
+			for(int j = 0; j<arrayOfSPs[i].priorityListOfVMs.length; j++) {
+				int vm = arrayOfSPs[i].priorityListOfVMs[j];
+				if(h.contains(vm)) {
+					int k = this.index(arrayOfSPs[i].priorityListOfVMs, vm);
+					double temp = (numVM-k)*100/(numVM-count);
+					count+=1;
+					sfactor += temp;
+				}
+			}
+			if(arrayOfSPs[i].currentlyMatched.size()==0) {
 				continue;
 			}
 			sfactor = sfactor/arrayOfSPs[i].currentlyMatched.size();
-			factor[i] = sfactor;
+			factor[i] = (float)sfactor; 
+			
 		}
 		return factor;
-	}
+	} 
 	
-	private int welfare(SP[] arrayOfSPs, VM[] arrayOfVMs, int[] capacitiesOfSPs, int[] priceOfSPs) {
-		int welfareSP = 0;
-		int welfareVMs = 0;
-		int totalWelfare = 0;
+	private float welfare(SP[] arrayOfSPs, VM[] arrayOfVMs, int[] capacitiesOfSPs, int[] priceOfSPs) {
+		int costIncurred = 0;
+		float welfareSP = 0;
+		float welfareVMs = 0;
+		float totalWelfare = 0;
 		for(int i = 0; i<arrayOfSPs.length; i++) {
 			for(int j = 0; j<arrayOfSPs[i].currentlyMatched.size(); j++) {
 				int vm = arrayOfSPs[i].currentlyMatched.get(j);
-				welfareSP += ((arrayOfVMs[vm].requirement * capacitiesOfSPs[i]) - (priceOfSPs[i]*arrayOfVMs[vm].requirement)) * arrayOfVMs[vm].requirement;
+				welfareSP += ((arrayOfVMs[vm].requirement * priceOfSPs[i]) - costIncurred) * arrayOfVMs[vm].requirement; 
 			}
 		}
 		for(int i = 0; i<arrayOfVMs.length; i++) {
@@ -355,7 +366,7 @@ public class RandomisedRDA {
 			if(sp == -1) {
 				continue;
 			}
-			welfareVMs += arrayOfVMs[i].requirement/(arrayOfVMs[i].requirement * capacitiesOfSPs[sp]);
+			welfareVMs += 1/arrayOfVMs[i].requirement*(priceOfSPs[sp]);  
 		}
 		totalWelfare = welfareSP + welfareVMs;
 		return totalWelfare;
@@ -421,7 +432,7 @@ public class RandomisedRDA {
 		avg = avg/factor.length;
 		System.out.print(avg+"% \n");
 		System.out.println("This is satisfaction factor for SPs");
-		int[] fact = this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs);
+		float[] fact = this.satisfactionFactorHost(arrayOfSPs, matching, numVM, numSPs); 
 		System.out.println(Arrays.toString(fact)); 
 		System.out.print("Average satisfaction factor for SPs: ");
 		avg = 0;
@@ -430,7 +441,7 @@ public class RandomisedRDA {
 		}
 		avg = avg/fact.length;
 		System.out.print(avg+"%\n");
-		System.out.println(Arrays.toString(fact));  
+		//System.out.println(Arrays.toString(fact));  
 		System.out.println("This is revenue for SPs");
 		int[] rev = this.revenueSP(arrayOfSPs, arrayOfVMs);
 		System.out.println(Arrays.toString(rev));
@@ -526,7 +537,7 @@ public class RandomisedRDA {
 		Scanner sc = new Scanner(System.in); 
 		RandomisedRDA obj = new RandomisedRDA();
 		int[] capacitiesOfSPs = {3000,2000,3500,1500};
-		int[] priceOfSPs = {8,7,12,9};
+		int[] priceOfSPs = {10,7,12,9};
 		System.out.println("Enter the number of VMs");
 		int numberOfVMs = sc.nextInt();
 		System.out.println("Enter the number of SPs");
