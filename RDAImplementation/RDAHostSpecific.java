@@ -216,12 +216,12 @@ public class RDAHostSpecific {
 			if(sp == -1) {
 				continue;
 			}
-			welfareVMs += 1/arrayOfVMs[i].requirement*(priceOfSPs[sp]);  
+			welfareVMs += 1/arrayOfVMs[i].requirement+(priceOfSPs[sp]);  
 		}
 		totalWelfare = welfareSP + welfareVMs;
 		return totalWelfare;
 	} 
-	
+	 
 	// This is the rDA method to perform matching (Host Specific) 
 	public void rDA(int numVMs, int numSPs, VM[] arrayOfVMs, SP[] arrayOfSPs){ 
 		// waitingQueue will schedule the host to go for matching

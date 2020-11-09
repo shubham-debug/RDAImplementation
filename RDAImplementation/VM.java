@@ -20,7 +20,7 @@ public class VM {
 	VM(int numSP){
 		priorityListOfSPs = new int[numSP];
 		Arrays.fill(priorityListOfSPs, -1);
-		requirement = (int)(5*Math.random())+6;
+		requirement = (int)(1*Math.random())+10;
 		currentlyMatched = false;
 		SP = -1;
 		pointer = 0;

@@ -619,15 +619,19 @@ public class RDA {
 			}
 			count+=1;
 		}
+		System.out.println("This is VM specific");
 		obj.rDA(numberOfVMs, numberOfSPs, arrayOfVMs, arrayOfSPs);
+		System.out.print("This is welfare: ");
+		System.out.print(obj.welfare(arrayOfSPs, arrayOfVMs, capacitiesOfSPs, priceOfSPs)+"\n");
+//		System.out.println("This is host Specific");
+//		RDAHostSpecific obj1 = new RDAHostSpecific();
+//		obj1.rDA(numberOfVMs, numberOfSPs, arrayOfVMs, arrayOfSPs);
 //		System.out.println("This is the matched VMs");
 //		for(int i = 0; i<numberOfSPs; i++) {
 //			System.out.println("This is SP"+i+" :"+arrayOfSPs[i].currentlyMatched);
 //			System.out.println(arrayOfSPs[i].bestRejected);
 //			System.out.println(arrayOfSPs[i].capacity); 
 //		}
-		System.out.print("This is welfare: ");
-		System.out.print(obj.welfare(arrayOfSPs, arrayOfVMs, capacitiesOfSPs, priceOfSPs)+"\n");
 		System.out.println("successfull");
 		sc.close();
 		br.close();
